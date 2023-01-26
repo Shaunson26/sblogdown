@@ -1,0 +1,57 @@
+title: Stumbling through the data stuffs
+theme: hugo-theme-flat
+enableRobotsTXT: yes
+hasCJKLanguage: yes
+paginate: 6
+baseURL: ''
+markup:
+  goldmark:
+    renderer:
+      unsafe: true
+  highlight:
+    anchorLineNos: no
+    codeFences: yes
+    guessSyntax: no
+    hl_Lines: ''
+    lineAnchors: ''
+    lineNoStart: 1
+    lineNos: no
+    lineNumbersInTable: no
+    noClasses: no
+    noHl: no
+    style: monokailight
+    tabWidth: 4
+params:
+  footer_rows:
+    - items:
+        - name: Creative Commons Attribution 4.0 International
+          pre: Copyright <a href="https://creativecommons.org/licenses/by/4.0/">CC
+            BY-4.0</a>
+          url: https://creativecommons.org/licenses/by/4.0/
+    - items:
+        - name: Hugo
+          pre: Powered by <a href="https://gohugo.io">Hugo</a>
+          url: https://gohugo.io
+        - name: theme flat
+          pre: Theme <a href="https://cgit.leafee98.com/hugo-theme-flat.git">hugo-theme-flat</a>
+          url: https://cgit.leafee98.com/hugo-theme-flat.git
+  mainSections: posts
+menus:
+  main:
+    - name: Posts
+      url: /posts/
+      weight: 30
+    # - name: Essays
+    #   url: /essays/
+    #   weight: 40
+    - name: About
+      pageref: about
+      weight: 80
+#    - name: Services
+#      weight: 60
+#    - name: Service A
+#      parent: Services
+#      url: '#'
+#    - name: Service B
+#      parent: Services
+#      url: '#'
