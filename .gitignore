@@ -3,5 +3,6 @@
 .Rdata
 .httr-oauth
 .DS_Store
+.renviron
 themes/hugo-theme-flat/exampleSite
 public/*

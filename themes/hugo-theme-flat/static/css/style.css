@@ -1,12 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
+
 :root {
   --fonts-sans-en: "Noto Sans", "Droid Sans", "Calibri", "Arial";
   --fonts-sans-zh: "WenQuanYi Zen Hei", "WenQuanYi Micro Hei",
                    "Noto Sans CJK", "Microsoft YaHei", "PingFang SC";
   --fonts-sans: var(--fonts-sans-en), var(--fonts-sans-zh), sans-serif;
 
-  --fonts-serif-en: "Noto Serif", "Times New Roman";
-  --fonts-serif-zh: "Noto Serif CJK", SimSun, STSong;
-  --fonts-serif: var(--fonts-serif-en), var(--fonts-serif-zh), serif;
+  --fonts-header: "Fredoka One", "Calibri", "Arial";
 
   --fonts-mono-en: "DejaVu Sans Mono", "Noto Sans Mono", "Consolas", "Courier";
   --fonts-mono-zh: "Noto Sans Mono CJK", "WenQuanYi Zen Hei Mono", "WenQuanYi Micro Hei Mono";
@@ -25,10 +25,17 @@
   --color-black-4: #101010;
   --color-black-5: #020202;
 
-  --color-fav-0: #EDD5DD;
+  /*--color-fav-0: #EDD5DD;
   --color-fav-1: #F0B3B2;
   --color-fav-2: #DE629E;
-  --color-fav-3: #CB3E50;
+  --color-fav-3: #CB3E50;*/
+
+  --color-fav-4: #03396c;
+  --color-fav-3: #005b96;
+  --color-fav-2: #6497b1;
+  --color-fav-1: #b3cde0;
+  --color-fav-0: #ebf2f7;
+
 
   --len-0: 0.00rem;
   --len-1: 0.25rem;
@@ -171,9 +178,9 @@ body {
 /* setup hyper link style */
 .header .site-title {
   text-decoration: none;
-  font-family: var(--fonts-serif);
+  font-family: var(--fonts-header);
   font-size: var(--font-size-6);
-  font-weight: bold;
+  /*font-weight: bold;*/
 }
 
 /********** set up menus layout **********/
@@ -214,9 +221,9 @@ body {
 
 /* beautify menu item */
 .header .menu-item {
-  font-family: var(--fonts-serif);
+  font-family: var(--fonts-header);
   font-size: var(--font-size-3);
-  font-weight: bold;
+  /*font-weight: bold;*/
 }
 
 .header a       { color: var(--color-black-3); text-decoration: none; }

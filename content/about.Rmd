@@ -1,5 +1,5 @@
 ---
-date: "`r Sys.Date()`"
+date: "Last updated `r Sys.Date()`"
 draft: false
 title: About
 output: md_document
@@ -8,5 +8,7 @@ output: md_document
 ## About me
 
 TODO
+
+But you could just go <a href='shaunnielsen.com' target="_blank">here</a>
 
 

@@ -13,4 +13,7 @@ options(
 )
 
 # fix Hugo version
-options(blogdown.hugo.version = "0.110.0")
+options(blogdown.hugo.version = "0.110.0",
+        blogdown.hugo.dir = '/home/snielsen/.local/share/Hugo')
+
+Sys.setenv(HUGO_CACHEDIR = '/home/snielsen/.local/share')
