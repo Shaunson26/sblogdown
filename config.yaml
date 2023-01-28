@@ -34,16 +34,13 @@ params:
           url: https://gohugo.io
         - name: theme flat
           pre: Theme <a href="https://cgit.leafee98.com/hugo-theme-flat.git">hugo-theme-flat</a>
-          url: https://cgit.leafee98.com/hugo-theme-flat.git
+          url: https://github.com/leafee98/hugo-theme-flat
   mainSections: posts
 menus:
   main:
     - name: Posts
       url: /posts/
       weight: 30
-    # - name: Essays
-    #   url: /essays/
-    #   weight: 40
     - name: About
       pageref: about
       weight: 80
