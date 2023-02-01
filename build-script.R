@@ -1,1 +1,1 @@
-blogdown::build_site(TRUE, relativeURLs = TRUE)
+blogdown::build_site(relativeURLs = TRUE)

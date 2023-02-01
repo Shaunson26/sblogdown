@@ -11,7 +11,7 @@ tags: [
 weight: 50
 show_comments: yes
 katex: no
-draft: yes
+draft: no
 ---
 
 Today I configured a GitHub Action to SSH my server and pull the main branch
