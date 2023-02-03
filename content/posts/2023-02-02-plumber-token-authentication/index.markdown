@@ -4,11 +4,11 @@ author: Shaun Nielsen
 date: '2023-02-02'
 slug: []
 categories: ['HTTP API']
-tags: ['plumber']
+tags: ['plumber', 'callr']
 weight: 50
 show_comments: yes
 katex: no
-draft: yes
+draft: no
 ---
 
 I'm working on a project that involves using a server to take in user data to
@@ -318,7 +318,7 @@ token <-
 ```
 
 ```
-## [1] "NeIQjjbDkYa7Y6nW2BbjNCL1"
+## [1] "3jDbjXcCfEvpiFAoNK6mgqEb"
 ```
 
 And then include it in future requests
@@ -371,10 +371,10 @@ resp_with_token %>%
 ## [1] "1234"
 ## 
 ## $token
-## [1] "NeIQjjbDkYa7Y6nW2BbjNCL1"
+## [1] "3jDbjXcCfEvpiFAoNK6mgqEb"
 ## 
 ## $token_expiry
-## [1] "1675417306.32902"
+## [1] "1675417694.76748"
 ```
 
 Since the token is time-limited (10 seconds here), what if we wait 12 seconds and try again?
