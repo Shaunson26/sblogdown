@@ -113,7 +113,7 @@ function(req, res) {
     dplyr::collect()
 
   if (nrow(token_row) == 0){
-    res$status <- 500
+    res$status <- 401
     return(list(error = 'token not allocated to user'))
   }
 
@@ -318,7 +318,7 @@ token <-
 ```
 
 ```
-## [1] "3jDbjXcCfEvpiFAoNK6mgqEb"
+## [1] "vM2DKM13ydi4B9xbhYJSVrrJ"
 ```
 
 And then include it in future requests
@@ -371,10 +371,10 @@ resp_with_token %>%
 ## [1] "1234"
 ## 
 ## $token
-## [1] "3jDbjXcCfEvpiFAoNK6mgqEb"
+## [1] "vM2DKM13ydi4B9xbhYJSVrrJ"
 ## 
 ## $token_expiry
-## [1] "1675417694.76748"
+## [1] "1675421367.15528"
 ```
 
 Since the token is time-limited (10 seconds here), what if we wait 12 seconds and try again?
@@ -448,6 +448,7 @@ sending HTTP response codes, and using a local SQL database for credential stora
 Obviously there are better ways to handle security (type of token, 
 where does token go - in cookies?, encrypted cookies), or do what we did above is a better way (ensure
 credential DB is more secure - set permissions on the server) but we have a simple working API with a security layer happening.
+
 
 
 

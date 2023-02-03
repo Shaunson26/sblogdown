@@ -39,7 +39,7 @@ function(req, res) {
     dplyr::collect()
 
   if (nrow(token_row) == 0){
-    res$status <- 500
+    res$status <- 401
     return(list(error = 'token not allocated to user'))
   }
 
