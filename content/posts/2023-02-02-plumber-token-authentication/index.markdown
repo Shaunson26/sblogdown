@@ -1,5 +1,5 @@
 ---
-title: plumber token authentication
+title: Plumber token authentication
 author: Shaun Nielsen
 date: '2023-02-02'
 slug: []
@@ -318,7 +318,11 @@ token <-
 ```
 
 ```
+<<<<<<< HEAD
 ## [1] "vM2DKM13ydi4B9xbhYJSVrrJ"
+=======
+## [1] "nTSXcCLNRXbmiqDckxk6vgmW"
+>>>>>>> c924037bf5e3641ef086e832f47e7308862b857d
 ```
 
 And then include it in future requests
@@ -371,10 +375,17 @@ resp_with_token %>%
 ## [1] "1234"
 ## 
 ## $token
+<<<<<<< HEAD
 ## [1] "vM2DKM13ydi4B9xbhYJSVrrJ"
 ## 
 ## $token_expiry
 ## [1] "1675421367.15528"
+=======
+## [1] "nTSXcCLNRXbmiqDckxk6vgmW"
+## 
+## $token_expiry
+## [1] "1675420033.52711"
+>>>>>>> c924037bf5e3641ef086e832f47e7308862b857d
 ```
 
 Since the token is time-limited (10 seconds here), what if we wait 12 seconds and try again?
