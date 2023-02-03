@@ -1,5 +1,5 @@
 ---
-title: plumber token authentication
+title: Plumber token authentication
 author: Shaun Nielsen
 date: '2023-02-02'
 slug: []
@@ -53,7 +53,7 @@ SQL code (which could otherwise be properly written as SQL statements). For deve
 
 A simple local SQL DB.
 
-```{r, eval = F}
+```{r, eval = !file.exists('users.sql')}
 users <- RSQLite::dbConnect(RSQLite::SQLite(), "users.sql")
 
 users_values <-
