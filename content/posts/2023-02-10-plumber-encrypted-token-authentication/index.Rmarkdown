@@ -1,0 +1,222 @@
+---
+title: Plumber encrypted token authentication
+author: Shaun Nielsen
+date: '2023-02-10'
+slug: []
+categories: ['HTTP-API',]
+tags: ['Plumber', 'callr', 'Encrypted cookie']
+weight: 50
+show_comments: yes
+katex: no
+draft: no
+---
+
+I'm continuing investigating the `plumber` R package. I explored [setting cookies in plumber](https://www.rplumber.io/articles/rendering-output.html?#setting-cookies),
+and attempted to decipher the encrypted cookie use. After some time I reached an endpoint (pun intended!).
+This post follows on (and resembles a lot) a [previous post on tokens with plumber](../2023-02-02-plumber-token-authentication). 
+
+<!--more-->
+
+## Background
+
+[plumber documentation](https://www.rplumber.io/articles/rendering-output.html?#setting-cookies)
+describes the ability to use cookies, both plain-text and encrypted. I wanted to 
+try their encrypted cookies function to see how it works.
+
+It requires explicitly adding a cookie function to the router after constructing it. 
+
+```
+pr %>%
+  pr_cookie("mySecretHere", "cookieName")
+```
+
+I could not quite understand the follow text in the documentation, but I believe it makes
+the object `req$session` available on incoming requests and then encrypts any data you
+allocate to it, or at least any further objects you add to it. 
+
+Let's see it in action
+
+## The logic
+
+1. A plumber HTTP API is up and running ('the API')
+2. Users can request a token by POSTing credentials. The API validates the credentials using
+a local DB*. If valid, it creates a token by encrypting a given value using `pr_cookie()`/`session_cookie()`,
+and which is returned as a cookie in the response.
+  - the value can be anything, even a complex object. **Here we pass it an expiry time value.**
+  - the value is encrypted when it arrives to the client, and decrypted when the client passes it
+  back to the server
+3. When another request is made it must include the cookie header 'token' with the token value
+4. The API checks the request for a cookie 'token', 
+5. If the token is found, it will be **decrypted back to the time value** for which we can run it 
+through a predicate function (if/else)
+6. Where any of the validation steps fail, a response is sent with various 400 status codes. 
+
+* Having a DB means this thing is not stateless ..
+
+> This logic is different to my previous post, as we no longer need to store the token or it's expiry time
+in a DB
+
+## The setup
+
+The API itself required `plumber`, `dplyr` and `RSQLite`. I used `dplyr` as it simplified some
+SQL code (which could otherwise be properly written as SQL statements). For development, I used `httr2` for interacting with the API and `callr` to run the API within the same RStudio session.
+
+### User DB
+
+A simple local SQL DB.
+
+```{r, eval = !file.exists('users.sql')}
+users <- RSQLite::dbConnect(RSQLite::SQLite(), "users.sql")
+
+users_values <-
+  tibble::tribble(
+    ~name, ~user, ~password, ~token, ~token_expiry,
+    'John','jbrown','1234','','',
+    'Sally','sblue', '4321','',''
+  )
+
+RSQLite::dbWriteTable(users, name = 'users', value = users_values)
+RSQLite::dbDisconnect(users)
+```
+
+### Plumber script
+
+`encrypted-cookie-api.R`
+
+Note the use of a cryptological key.
+
+```{r, code=readLines('encrypted-cookie-api.R'), echo = TRUE, eval = F}
+```
+
+### Testing
+
+I used `callr` to create a background process with the API running
+
+```{r}
+rp <- 
+  callr::r_bg(function(){ 
+    plumber::pr_run(plumber::pr('encrypted-cookie-api.R'), port = 8989)
+  })
+```
+
+```{r, include = F}
+Sys.sleep(5)
+```
+
+```{r}
+rp$is_alive()
+cat(rp$read_error())
+```
+
+Then query the API using `httr2`
+
+```{r}
+library(httr2)
+
+requrl <- httr2::request('http://127.0.0.1:8989')
+```
+
+The endpoint `/do-something` will be reached after the request goes through the
+`token_check` filter. Here, no token is provided. Note that if an error is sent
+by the server to the client, `httr2` will by default throw an R error and we do not
+want that here hence the `req_error()` line - we would otherwise not be able to see
+what the error message sent was.
+
+```{r}
+# The response
+resp_no_token <-
+  requrl %>% 
+  req_url_path_append('do-something') %>% 
+  req_error(is_error = function(res) FALSE) %>% 
+  req_perform() %>% 
+  print()
+
+# The response message
+resp_no_token %>% 
+  resp_body_json() %>% 
+  print()
+```
+
+Thus a user needs to submit their credentials to the end point `/refresh-token` to 
+receive a (time-limited) token. Remember this endpoint does not go through the `token_check` filter
+due to the `@preempt` directive used. We then extract the value of the cookie in the header.
+You must be careful if there are multiple cookies received - here there is only one.
+
+```{r}
+token_resp <-
+  requrl %>% 
+  req_url_path_append('refresh-token') %>% 
+  req_body_json(
+    list(user = 'jbrown',
+         password = '1234')
+  ) %>% 
+  req_perform() %>% 
+  print()
+```
+
+```{r}
+token_resp_headers <-
+  token_resp %>% 
+  resp_headers('set-cookie')
+
+token_resp_headers
+
+token <- sub(';.*', '', token_resp_headers[[1]])
+token
+```
+
+And then include it in future requests
+
+```{r}
+resp_with_token <-
+  requrl %>% 
+  req_url_path_append('do-something') %>%
+  req_error(is_error = function(res) FALSE) %>% 
+  req_headers(cookie = token) %>% 
+  req_perform()
+
+resp_with_token %>% 
+  resp_body_json() %>% 
+  print()
+```
+
+Since the token is time-limited (10 seconds here), what if we wait 12 seconds and try again?
+
+```{r}
+Sys.sleep(12)
+```
+
+```{r}
+resp_with_token <-
+  requrl %>% 
+  req_url_path_append('do-something') %>%
+  req_error(is_error = function(res) FALSE) %>% 
+  req_headers(cookie = token) %>% 
+  req_perform()
+
+resp_with_token %>% 
+  resp_body_json() %>% 
+  print()
+```
+
+A call to `/refresh-token` is required to move forward ...
+
+Kill background R process (the API)
+
+```{r, echo = TRUE}
+rp$kill()
+```
+
+## Conclusion
+
+Here we explored using encrypted cookies with `plumber`. We learned how to set
+a new encrypted cookie with a value (a time stamp), and how it encrypted on it's way 
+to the client and how plumber will decrypt it when it is returned.
+
+We improved on my  [previous post](../2023-02-02-plumber-token-authentication) by not 
+needing to store the token or the expiry time in a database.
+
+```{r, include = F}
+unlink('users.sql')
+```
+
