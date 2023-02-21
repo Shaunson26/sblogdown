@@ -1,3 +1,3 @@
-blogdown::new_post(title = "Plumber encrypted token authentication",
+blogdown::new_post(title = "A better recursion function example in R",
                    ext = '.Rmarkdown',
                    subdir = "posts")

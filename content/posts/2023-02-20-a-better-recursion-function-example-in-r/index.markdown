@@ -1,0 +1,736 @@
+---
+title: A better recursion function example in R
+author: Shaun Nielsen
+date: '2023-02-20'
+slug: []
+categories: ['recursive function']
+tags: ['recursive function']
+weight: 50
+show_comments: yes
+katex: no
+draft: no
+---
+
+I had a problem to solve that involved using a recursive function - following
+links through web pages, programmatically, until a target was found. Searching Google
+for recursive function tutorials provided examples that were all the same and of 
+no real use - calculate a single factorial value or Fibonacci sequence. I wanted 
+a function to capture values and return a 'complex' object. 
+
+<!--more-->
+
+## Background
+
+I was attempting to capture all the dataset URLs from an online server by simulating
+clicking through their file directories. The root page would give a relative link to
+following pages, and this would happen recursively until you hit the a directory
+node/end point with 'dataset' links. Clearly, I wanted a function that would take 
+the root URL get the links, navigateto each of them, do this again and again until
+the page resulted in that with the dataset links.  
+
+To check whether the current page for held 'links' or 'datasets' was simple as either the page
+had `catalogref` or `dataset` nodes, respectively. I wanted to return the values in the
+dataset nodes while capturing the path to them from the root URL. Sounds simple, but it was my
+first real foray in recursive programming.
+
+## The example data
+
+In this example, I use a mock list to simulate the URLs, recurse through them and
+return the dataset values if found.
+
+
+```r
+mock_list <-
+  list(
+    a = list(
+      aa = list(data = 1,
+                data = 2,
+                data = 3),
+      bb = list(data = 4,
+                data = 5)
+    ),
+    b = list(
+      ba = list(data = 6), 
+      bb = list(data = 7,
+                data = 8)
+    )
+  )
+```
+
+The goal would be to return something like
+
+```
+a:aa:data = 1,2,3
+```
+
+## The recursive function
+
+### Building the logic
+
+Our function starts with a list.
+
+
+```r
+find_data <- function(list) {
+}
+```
+
+It should use the names of the list to access it's elements/values, and then
+iterate through them with a `for` loop (maybe an `apply` function could work also).
+While we work through this, we'll message (print) the list name to the console, as
+well as the element itself.
+
+
+```r
+find_data <- function(list) {
+  
+  list_names <- names(list)
+  
+  for (list_name in list_names) {
+    
+    list_element <- list[[list_name]]
+    
+    # do something
+    message(list_name)
+    print(list_element)
+  }
+  
+}
+```
+
+With this function, we only examine the top-level list elements.
+
+
+```r
+mock_list |>
+  find_data()
+```
+
+```
+## a
+```
+
+```
+## $aa
+## $aa$data
+## [1] 1
+## 
+## $aa$data
+## [1] 2
+## 
+## $aa$data
+## [1] 3
+## 
+## 
+## $bb
+## $bb$data
+## [1] 4
+## 
+## $bb$data
+## [1] 5
+```
+
+```
+## b
+```
+
+```
+## $ba
+## $ba$data
+## [1] 6
+## 
+## 
+## $bb
+## $bb$data
+## [1] 7
+## 
+## $bb$data
+## [1] 8
+```
+
+### Adding recursion
+
+Thus we need a tell the function to run itself with the current list element.
+
+
+```r
+find_data <- function(list) {
+  
+  list_names <- names(list)
+  
+  for (list_name in list_names) {
+    
+    list_element <- list[[list_name]]
+    
+    # do something
+    message(list_name)
+    print(list_element)
+    
+    # run function again
+    find_data(list_element)
+    
+  }
+  
+}
+```
+
+An like magic, we've gone through **all** the list elements.
+
+
+```r
+mock_list |>
+  find_data()
+```
+
+```
+## a
+```
+
+```
+## $aa
+## $aa$data
+## [1] 1
+## 
+## $aa$data
+## [1] 2
+## 
+## $aa$data
+## [1] 3
+## 
+## 
+## $bb
+## $bb$data
+## [1] 4
+## 
+## $bb$data
+## [1] 5
+```
+
+```
+## aa
+```
+
+```
+## $data
+## [1] 1
+## 
+## $data
+## [1] 2
+## 
+## $data
+## [1] 3
+```
+
+```
+## data
+```
+
+```
+## [1] 1
+```
+
+```
+## data
+```
+
+```
+## [1] 1
+```
+
+```
+## data
+```
+
+```
+## [1] 1
+```
+
+```
+## bb
+```
+
+```
+## $data
+## [1] 4
+## 
+## $data
+## [1] 5
+```
+
+```
+## data
+```
+
+```
+## [1] 4
+```
+
+```
+## data
+```
+
+```
+## [1] 4
+```
+
+```
+## b
+```
+
+```
+## $ba
+## $ba$data
+## [1] 6
+## 
+## 
+## $bb
+## $bb$data
+## [1] 7
+## 
+## $bb$data
+## [1] 8
+```
+
+```
+## ba
+```
+
+```
+## $data
+## [1] 6
+```
+
+```
+## data
+```
+
+```
+## [1] 6
+```
+
+```
+## bb
+```
+
+```
+## $data
+## [1] 7
+## 
+## $data
+## [1] 8
+```
+
+```
+## data
+```
+
+```
+## [1] 7
+```
+
+```
+## data
+```
+
+```
+## [1] 7
+```
+
+### Improving the logic
+
+We only want to return something where the names `data` exist in the list elements.
+
+
+```r
+find_data <- function(list) {
+  
+  list_names <- names(list)
+  
+  for (list_name in list_names) {
+    
+    list_element <- list[[list_name]]
+    
+    # do something
+    message(list_name)
+    
+    # examine list element names
+    list_element_names <- names(list_element)
+    
+    # do something depending on 'data' in names of elements
+    has_data_names = any('data' %in% list_element_names)
+    
+    if (has_data_names){
+      message('  element has data')
+    } else {
+      message('  need to recurse')
+    }
+    
+    # run function again
+    find_data(list_element)
+    
+  }
+  
+}
+```
+
+This almost works.
+
+
+```r
+mock_list |>
+  find_data()
+```
+
+```
+## a
+```
+
+```
+##   need to recurse
+```
+
+```
+## aa
+```
+
+```
+##   element has data
+```
+
+```
+## data
+```
+
+```
+##   need to recurse
+```
+
+```
+## data
+```
+
+```
+##   need to recurse
+```
+
+```
+## data
+```
+
+```
+##   need to recurse
+```
+
+```
+## bb
+```
+
+```
+##   element has data
+```
+
+```
+## data
+```
+
+```
+##   need to recurse
+```
+
+```
+## data
+```
+
+```
+##   need to recurse
+```
+
+```
+## b
+```
+
+```
+##   need to recurse
+```
+
+```
+## ba
+```
+
+```
+##   element has data
+```
+
+```
+## data
+```
+
+```
+##   need to recurse
+```
+
+```
+## bb
+```
+
+```
+##   element has data
+```
+
+```
+## data
+```
+
+```
+##   need to recurse
+```
+
+```
+## data
+```
+
+```
+##   need to recurse
+```
+
+Reason why it 'almost' works is that we go too far into the list.
+
+```
+a                    # mock_list$a
+  need to recurse    # does not have 'data' elements
+aa                   # mock_list$a$aa
+  element has data   # has 'data' elements ... we want to return data here
+data                 # BUT our function continues for each child element
+  need to recurse
+data                 # here ..
+  need to recurse
+data                 # and here ...
+  need to recurse
+ab                   # We should conintue here
+  element has data
+...
+```
+
+### Moving the recursion position
+
+We need to only recurse when we do not find 'data'.
+
+
+```r
+find_data <- function(list) {
+  
+  list_names <- names(list)
+  
+  for (list_name in list_names) {
+    
+    list_element <- list[[list_name]]
+    
+    # do something
+    message(list_name)
+    
+    # examine list element names
+    list_element_names <- names(list_element)
+    
+    # do something depending on 'data' in names of elements
+    has_data_names = any('data' %in% list_element_names)
+    
+    if (has_data_names){
+      message('  element has data')
+    } else {
+      message('  need to recurse')
+      # run function when we need to recurse
+      find_data(list_element)
+    }
+    
+  }
+  
+}
+```
+
+This looks like what we're after. But we are only printing to the console right now.
+
+
+```r
+mock_list |>
+  find_data()
+```
+
+```
+## a
+```
+
+```
+##   need to recurse
+```
+
+```
+## aa
+```
+
+```
+##   element has data
+```
+
+```
+## bb
+```
+
+```
+##   element has data
+```
+
+```
+## b
+```
+
+```
+##   need to recurse
+```
+
+```
+## ba
+```
+
+```
+##   element has data
+```
+
+```
+## bb
+```
+
+```
+##   element has data
+```
+
+### Returning data
+
+Now the mind boggling part - what, when and where do our outputs go?
+
+A list object is a good choice, as we can build them up using named elements. We then
+allocate data to named elements in it **both when the function is returning **
+**data and when the recursion function is returning data.**
+
+>  I only arrived at this solution through trial and error !!
+
+
+```r
+find_data <- function(list) {
+  
+  # Output list to save results
+  output <- list()
+  
+  list_names <- names(list)
+  
+  for (list_name in list_names) {
+    
+    list_element <- list[[list_name]]
+    
+    # examine list element names
+    list_element_names <- names(list_element)
+    
+    # do something depending on 'data' in names of elements
+    has_data_names = any('data' %in% list_element_names)
+    
+    if (has_data_names){
+      
+      # return the list element with data
+      output[[list_name]] <- list_element
+      
+    } else {
+      
+      # run function when we need to recurse
+      output[[list_name]] <- find_data(list_element)
+      
+    }
+    
+  }
+  
+  # and return the final output
+  output
+  
+}
+```
+
+
+Bingo! A named list that records the path to data through the names of the list e.g. `a$aa`
+
+
+```r
+mock_list |>
+  find_data()
+```
+
+```
+## $a
+## $a$aa
+## $a$aa$data
+## [1] 1
+## 
+## $a$aa$data
+## [1] 2
+## 
+## $a$aa$data
+## [1] 3
+## 
+## 
+## $a$bb
+## $a$bb$data
+## [1] 4
+## 
+## $a$bb$data
+## [1] 5
+## 
+## 
+## 
+## $b
+## $b$ba
+## $b$ba$data
+## [1] 6
+## 
+## 
+## $b$bb
+## $b$bb$data
+## [1] 7
+## 
+## $b$bb$data
+## [1] 8
+```
+
+
+```r
+results <-
+  mock_list |>
+  find_data()
+
+results$a$aa
+```
+
+```
+## $data
+## [1] 1
+## 
+## $data
+## [1] 2
+## 
+## $data
+## [1] 3
+```
+
+```r
+results$b$ba
+```
+
+```
+## $data
+## [1] 6
+```
+
+## Conclusion
+
+Here we wrote a recursive function to search through a list and return found objects
+into another list. The logic appeared relatively easily, but at the same time, how the
+final object is build is slightly perplexing as it seems like we were referencing the
+same thing - magic nonetheless.
+
+
